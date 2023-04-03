@@ -6,9 +6,15 @@ let c = canvas.getContext("2d");
 canvas.setAttribute("class", "canvas");
 document.body.appendChild(canvas);
 
-window.addEventListener('load', mainLoop,);
+window.addEventListener('load', mainLoop);
 window.addEventListener('keydown', mvm)
 window.addEventListener('keydown', shooting)
+
+//ARRAYS
+let sUnits = [];
+let bullets = [];
+
+//CLASSES
 class Sunit {
     constructor(lp, x, y, w, h, c,){
         this.lp = lp;
@@ -52,14 +58,25 @@ class Bullet {
     }
 }
 
-//Enemy units
-let sUnits = [];
-for (i = 0; i<20; i++){
-    let Enemy = new Sunit(i, 11 + i*50, 100, 25, 25, "black");
-    sUnits.push(Enemy);
+// NEW CLASS MAKERS
+
+for (i = 0; i<16; i++){
+    let ex = 11 + i * 50
+    let Enemy = new Sunit(i, ex, 100, 25, 25, "black");
+    sUnits.push(Enemy); 
+   
 }
 
-//movement 
+let p1 = new Player(canvas.width/2, 500, 50, 30, "blue");
+
+function shooting(e) {
+    if(e.keyCode == 65 && bullets.length <1){
+        let b1 = new Bullet (p1.x, p1.y, 10, 10, "yellow")
+        bullets.push(b1)
+    }
+}
+
+//PLAYER MOVEMENT
 
 function mvm(e) {
     
@@ -70,42 +87,48 @@ function mvm(e) {
         p1.x += 10;
     }
 }
-let p1 = new Player(canvas.width/2, 500, 50, 30, "blue");
 
+// DRAW FUNCTIONS
 
-function mainLoop(){
-    c.clearRect(0, 0, 800, 600);
-    for (i = 0; i < 20; i++){
+//enemies
+function drawEnemie(){
+    for (i = 0; i < sUnits.length; i++){
         sUnits[i].drawSu();
     };
-    
-        p1.drawPlayer()
-
-        if(bullets.length > 0){
-            bullets[0].drawBullet()
-            bullets[0].y -= 10;
-
-            if(bullets.length >0 ) {
-                if(bullets[0].y <= 10) {
-
-                    bullets.pop();
-// poping enemies
-                }
-            }
-
-        }
-window.requestAnimationFrame(mainLoop);
 }
-window.requestAnimationFrame(mainLoop);
 
-let bullets = [];
+//shot
+function drawShot() {
+    if(bullets.length > 0){
+        bullets[0].drawBullet()
+        bullets[0].y -= 10;
 
-function shooting(e) {
-    if(e.keyCode == 65 && bullets.length <1){
-        let b1 = new Bullet (p1.x, p1.y, 10, 10, "yellow")
-        bullets.push(b1)
+        if(bullets.length >0 ) {
+            if(bullets[0].y <= 100) {
+                bullets.pop();
+                let as = sUnits.findIndex(unit => unit.lp === Math.floor((p1.x -11)/50))
+                if (as !== -1){
+                sUnits.splice(as, 1)
+                console.log(as)}
+            }
+        }
     }
 }
 
+//MAINLOOP
+
+function mainLoop(){
+    c.clearRect(0, 0, 800, 600);
+
+  drawEnemie()
+
+    p1.drawPlayer()
+
+        drawShot()
+
+   
+window.requestAnimationFrame(mainLoop);
+}
+window.requestAnimationFrame(mainLoop);
 
 
